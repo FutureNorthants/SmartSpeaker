@@ -6,6 +6,17 @@ The aim of this project is to showcase innovation by building a smart speaker th
 - Python virtual environments able to be created
 - flac install (on mac with brew run ```brew install flac``` in ubuntu run ```sudo apt install flac```)
 
+Add a credentials.py file with the following format:
+
+```python
+class credentials():
+    def __init__(self):
+        self.QnA_DOMAIN=""
+        self.QnA_AUTH=""
+        self.QnA_COOKIE=""
+        self.QnA_ENDPOINT=""
+        self.QnA_CONFIDENCE=60
+```
 ## Setup
 
 Navigate to the folder
