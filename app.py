@@ -11,8 +11,8 @@ pp = pprint.PrettyPrinter(indent=4)
 from credentials import credentials
 creds = credentials()
 
-import pyttsx3
-engine = pyttsx3.init()
+#import pyttsx3
+#engine = pyttsx3.init()
 
 
 def listen():
@@ -65,4 +65,5 @@ def main():
     answer = get_QnA_results(question)
     say(answer)
 
-main()
+#main()
+print(listen())
