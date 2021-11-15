@@ -1,4 +1,5 @@
 #import library
+from math import e
 import speech_recognition as sr
 import http.client
 import json
@@ -23,12 +24,12 @@ def listen():
         print("Talk")
         audio_text = r.listen(source)
         print("Time over, thanks") 
-        try: # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling
+        try: # recognize_() method will throw a request error if the API is unreachable, hence using exception handling
             message = r.recognize_google(audio_text) # using google speech recognition
             print("Text: "+ message)
             return message
         except Exception as e:
-            print("Sorry, I did not get that" + e)
+            say("Sorry, I did not get that")
 
 
 def get_QnA_results(statement):
