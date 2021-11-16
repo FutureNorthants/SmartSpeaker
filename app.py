@@ -39,20 +39,21 @@ def listen():
             return 'error'
 
 
-def get_QnA_results(statement):
+def get_QnA_results(statement, debug = False):
+    statement = statement.replace("'", "")
     conn = http.client.HTTPSConnection(creds.QnA_DOMAIN)
-    payload = "{'question':'" + statement + "'}"
+    payload = "{'question':\'" + statement + "\'}"
     headers = {
         'Authorization': creds.QnA_AUTH,
         'Content-Type': 'application/json',
         'Cookie': creds.QnA_COOKIE
     }
-    try:
+    try:  
         conn.request("POST", creds.QnA_ENDPOINT, payload, headers)
         res = conn.getresponse()
         data = res.read().decode("utf-8")
         formatted_response = json.loads(data)
-
+        if debug == True: pp.pprint(formatted_response)
         if formatted_response['answers'][0]['score'] >= creds.QnA_CONFIDENCE:
             response = formatted_response['answers'][0]['answer']
         else:
@@ -79,3 +80,5 @@ def main():
         say(answer)
 
 main()
+
+# print (get_QnA_results("There's a broken Street Light in Kettering", True))
