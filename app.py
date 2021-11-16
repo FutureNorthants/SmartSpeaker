@@ -30,7 +30,7 @@ def listen():
         audio_text = r.listen(source)
         print("Time over, thanks") 
         try: 
-            message = r.recognize_google(audio_text)
+            message = r.recognize_google(audio_text, language='en-gb')
             return message
         except IndexError:
             print("No internet connection")
