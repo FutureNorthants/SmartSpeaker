@@ -39,7 +39,6 @@ def listen():
             return 'error'
 
 
-
 def get_QnA_results(statement):
     conn = http.client.HTTPSConnection(creds.QnA_DOMAIN)
     payload = "{'question':'" + statement + "'}"
@@ -52,19 +51,18 @@ def get_QnA_results(statement):
         conn.request("POST", creds.QnA_ENDPOINT, payload, headers)
         res = conn.getresponse()
         data = res.read().decode("utf-8")
+        formatted_response = json.loads(data)
+
+        if formatted_response['answers'][0]['score'] >= creds.QnA_CONFIDENCE:
+            response = formatted_response['answers'][0]['answer']
+        else:
+            response = 'I couldn\'t find an answer for that, please try searching the website'
+
+        return response
     except:
         print('Error connecting to QnA service')
         return ('error')
     
-    formatted_response = json.loads(data)
-
-    if formatted_response['answers'][0]['score'] >= creds.QnA_CONFIDENCE:
-        response = formatted_response['answers'][0]['answer']
-    else:
-        response = 'I couldn\'t find an answer for that, please try searching the website'
-
-    return response
-
 
 def say(statement):
     engine.say(statement)
@@ -75,9 +73,9 @@ def say(statement):
 # listening the speech and store in audio_text variable
 def main():
     question = listen()
-    if question is not 'error':
+    if question != 'error':
         answer = get_QnA_results(question)
-    if answer is not 'error':
+    if answer != 'error':
         say(answer)
 
 main()
