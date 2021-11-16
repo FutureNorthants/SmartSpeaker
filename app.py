@@ -1,4 +1,3 @@
-#import library
 import speech_recognition as sr
 import http.client
 import json
@@ -20,13 +19,18 @@ engine = pyttsx3.init()
 r = sr.Recognizer()
 
 def listen():
+    # Reading Microphone as source
+    # listening the speech and store in audio_text variable
+    # Sends the audio clip to google for transcription
+    # todo: Look into setting up own google api key and store in credentials
+    # todo: have it listen at the start to gauge backgroud noise
+    # todo: maybe set max duration and / or dynamically determine noise levels
     with sr.Microphone() as source:
         print("Talk")
         audio_text = r.listen(source)
         print("Time over, thanks") 
-        try: # recognize__() method will throw a request error if the API is unreachable, hence using exception handling
-            message = r.recognize_google(audio_text) # using google speech recognition
-            print("Text: "+ message)
+        try: 
+            message = r.recognize_google(audio_text)
             return message
         except IndexError:
             print("No internet connection")
@@ -70,8 +74,6 @@ def say(statement):
     engine.runAndWait()
 
 
-# Reading Microphone as source
-# listening the speech and store in audio_text variable
 def main():
     question = listen()
     if question != 'error':
@@ -81,4 +83,6 @@ def main():
 
 main()
 
+# print(listen())
 # print (get_QnA_results("There's a broken Street Light in Kettering", True))
+# say('I am a teapot, short and stout.')
