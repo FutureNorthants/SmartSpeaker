@@ -1,6 +1,7 @@
 import speech_recognition as sr
 import http.client
 import json
+from pocketsphinx import LiveSpeech
 
 # Setting up pretty printer - for debugging
 # use like pp.pprint(message)
@@ -17,21 +18,19 @@ engine = pyttsx3.init()
 
 # Initialize recognizer class (for recognizing the speech)
 r = sr.Recognizer()
+keywords = [("george", 1), ("norberta", 1), ("office candy", 1)]
+source = sr.Microphone()
 
 def listen():
-    # Reading Microphone as source
-    # listening the speech and store in audio_text variable
-    # Sends the audio clip to google for transcription
-    # todo: Look into setting up own google api key and store in credentials
-    # todo: have it listen at the start to gauge backgroud noise
-    # todo: maybe set max duration and / or dynamically determine noise levels
     with sr.Microphone() as source:
         print("Talk")
         audio_text = r.listen(source)
-        print("Time over, thanks") 
         try: 
-            message = r.recognize_google(audio_text, language='en-gb')
-            return message
+            message = r.recognize_sphinx(audio_text, keyword_entries=keywords)
+            if True:
+                return message
+        except sr.UnknownValueError:
+            print("Sphinx could not understand audio")
         except IndexError:
             print("No internet connection")
             return 'error'
@@ -41,7 +40,12 @@ def listen():
         except LookupError:
             print("Could not understand audio")
             return 'error'
-
+    # Reading Microphone as source
+    # listening the speech and store in audio_text variable
+    # Sends the audio clip to google for transcription
+    # todo: Look into setting up own google api key and store in credentials
+    # todo: have it listen at the start to gauge backgroud noise
+    # todo: maybe set max duration and / or dynamically determine noise levels
 
 def get_QnA_results(statement, debug = False):
     statement = statement.replace("'", "")
