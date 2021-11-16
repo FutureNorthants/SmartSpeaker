@@ -3,14 +3,16 @@ import speech_recognition as sr
 import http.client
 import json
 
-import pprint
 # Setting up pretty printer - for debugging
 # use like pp.pprint(message)
+import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
+# Bringing in QnA connection details
 from credentials import credentials
 creds = credentials()
 
+# Setting up text to speach
 import pyttsx3
 engine = pyttsx3.init()
 
@@ -23,12 +25,12 @@ def listen():
         print("Talk")
         audio_text = r.listen(source)
         print("Time over, thanks") 
-        try: # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling
+        try: # recognize__() method will throw a request error if the API is unreachable, hence using exception handling
             message = r.recognize_google(audio_text) # using google speech recognition
             print("Text: "+ message)
             return message
         except Exception as e:
-            print("Sorry, I did not get that" + e)
+            say("Sorry, I did not get that")
 
 
 def get_QnA_results(statement):
@@ -41,6 +43,7 @@ def get_QnA_results(statement):
     }
 
     conn.request("POST", creds.QnA_ENDPOINT, payload, headers)
+    
     res = conn.getresponse()
     data = res.read().decode("utf-8")
     formatted_response = json.loads(data)
