@@ -16,11 +16,10 @@ creds = credentials()
 import pyttsx3
 engine = pyttsx3.init()
 
+# Initialize recognizer class (for recognizing the speech)
+r = sr.Recognizer()
 
 def listen():
-    # Initialize recognizer class (for recognizing the speech)
-    r = sr.Recognizer()
-
     with sr.Microphone() as source:
         print("Talk")
         audio_text = r.listen(source)
@@ -29,8 +28,16 @@ def listen():
             message = r.recognize_google(audio_text) # using google speech recognition
             print("Text: "+ message)
             return message
-        except Exception as e:
-            say("Sorry, I did not get that")
+        except IndexError:
+            print("No internet connection")
+            return 'error'
+        except KeyError:
+            print("Invalid API key or quota maxed out")
+            return 'error'
+        except LookupError:
+            print("Could not understand audio")
+            return 'error'
+
 
 
 def get_QnA_results(statement):
@@ -41,11 +48,14 @@ def get_QnA_results(statement):
         'Content-Type': 'application/json',
         'Cookie': creds.QnA_COOKIE
     }
-
-    conn.request("POST", creds.QnA_ENDPOINT, payload, headers)
+    try:
+        conn.request("POST", creds.QnA_ENDPOINT, payload, headers)
+        res = conn.getresponse()
+        data = res.read().decode("utf-8")
+    except:
+        print('Error connecting to QnA service')
+        return ('error')
     
-    res = conn.getresponse()
-    data = res.read().decode("utf-8")
     formatted_response = json.loads(data)
 
     if formatted_response['answers'][0]['score'] >= creds.QnA_CONFIDENCE:
@@ -65,7 +75,9 @@ def say(statement):
 # listening the speech and store in audio_text variable
 def main():
     question = listen()
-    answer = get_QnA_results(question)
-    say(answer)
+    if question is not 'error':
+        answer = get_QnA_results(question)
+    if answer is not 'error':
+        say(answer)
 
 main()
