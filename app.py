@@ -23,14 +23,26 @@ def listen():
     # listening the speech and store in audio_text variable
     # Sends the audio clip to google for transcription
     # todo: Look into setting up own google api key and store in credentials
-    # todo: have it listen at the start to gauge backgroud noise
-    # todo: maybe set max duration and / or dynamically determine noise levels
+    # // Have it listen at the start to gauge backgroud noise
+    # // todo: Maybe set max duration and / or dynamically determine noise levels
     with sr.Microphone() as source:
+        print('Getting ambient noise levels')
+        r.adjust_for_ambient_noise(source, 0.5)
+        r.dynamic_energy_threshold = True
+
         print("Talk")
-        audio_text = r.listen(source)
+        audio_text = r.listen(
+            source, 
+            phrase_time_limit=10, 
+            )
         print("Time over, thanks") 
+
         try: 
-            message = r.recognize_google(audio_text, language='en-gb')
+            message = r.recognize_google(
+                audio_text, 
+                language='en-gb',
+                # key=None,
+                )
             return message
         except IndexError:
             print("No internet connection")
