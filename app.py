@@ -1,7 +1,7 @@
 import speech_recognition as sr
 import http.client
 import json
-hot_word='hello'
+import pyaudio
 
 # Setting up pretty printer - for debugging
 # use like pp.pprint(message)
@@ -14,39 +14,37 @@ creds = credentials()
 
 # Setting up text to speech
 import pyttsx3
+from pyttsx3 import engine
 engine = pyttsx3.init()
-# import gtts
-# from gtts import gTTS
-# import os
+engine.setProperty('rate', 175)
+engine.setProperty('voice', 5 )
 
 # Initialize recognizer class (for recognizing the speech)
 r = sr.Recognizer()
-#phrase = [("george", 1), ("norberta", 1), ("office candy", 1)]
 source = sr.Microphone()
+hot_word='Norbert'
 
 def listen():
     with sr.Microphone() as source:
-        r.energy_threshold = 50
-        r.dynamic_energy_threshold = False
+        #r.energy_threshold = 50
+        #r.dynamic_energy_threshold = False
         print("Talk")
         audio_text = r.listen(source, phrase_time_limit=5)
-    audio_text=r.recognize_google(audio_text, language="en-gb", show_all=True)
-    if hot_word in audio_text:
-        try: 
-            message = r.recognize_google(audio_text)
-            if True:
-                return message
-        except sr.UnknownValueError:
-            print("Sphinx could not understand audio")
-        except IndexError:
+    try: 
+        message = r.recognize_google(audio_text)
+        if hot_word in message:
+            return message
+    except sr.UnknownValueError:
+        print("Could not understand audio")
+    except IndexError:
             print("No internet connection")
             return 'error'
-        except KeyError:
-            print("Invalid API key or quota maxed out")
-            return 'error'
-        except LookupError:
-            print("Could not understand audio")
-            return 'error'
+    except KeyError:
+        print("Invalid API key or quota maxed out")
+        return 'error'
+    except LookupError:
+        print("Could not understand audio")
+        return 'error'
 
 
 def get_QnA_results(statement, debug = False):
