@@ -22,7 +22,7 @@ engine.setProperty('voice', 5 )
 # Initialize recognizer class (for recognizing the speech)
 r = sr.Recognizer()
 source = sr.Microphone()
-hot_word='Norbert'
+#hot_word='Norbert'
 
 def listen():
     with sr.Microphone() as source:
@@ -32,8 +32,9 @@ def listen():
         audio_text = r.listen(source, phrase_time_limit=5)
     try: 
         message = r.recognize_google(audio_text)
-        if hot_word in message:
-            return message
+        return message
+	 # if hot_word in message:
+           # return message
     except sr.UnknownValueError:
         print("Could not understand audio")
     except IndexError:
