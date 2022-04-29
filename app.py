@@ -1,6 +1,7 @@
 import speech_recognition as sr
 import http.client
 import json
+import pyaudio
 
 # Setting up pretty printer - for debugging
 # use like pp.pprint(message)
@@ -11,36 +12,40 @@ pp = pprint.PrettyPrinter(indent=4)
 from credentials import credentials
 creds = credentials()
 
-# Setting up text to speach
+# Setting up text to speech
 import pyttsx3
+from pyttsx3 import engine
 engine = pyttsx3.init()
+engine.setProperty('rate', 175)
+engine.setProperty('voice', 5 )
 
 # Initialize recognizer class (for recognizing the speech)
 r = sr.Recognizer()
+source = sr.Microphone()
+#hot_word='Norbert'
 
 def listen():
-    # Reading Microphone as source
-    # listening the speech and store in audio_text variable
-    # Sends the audio clip to google for transcription
-    # todo: Look into setting up own google api key and store in credentials
-    # todo: have it listen at the start to gauge backgroud noise
-    # todo: maybe set max duration and / or dynamically determine noise levels
     with sr.Microphone() as source:
+        #r.energy_threshold = 50
+        #r.dynamic_energy_threshold = False
         print("Talk")
-        audio_text = r.listen(source)
-        print("Time over, thanks") 
-        try: 
-            message = r.recognize_google(audio_text, language='en-gb')
-            return message
-        except IndexError:
+        audio_text = r.listen(source, phrase_time_limit=5)
+    try: 
+        message = r.recognize_google(audio_text)
+        return message
+	 # if hot_word in message:
+           # return message
+    except sr.UnknownValueError:
+        print("Could not understand audio")
+    except IndexError:
             print("No internet connection")
             return 'error'
-        except KeyError:
-            print("Invalid API key or quota maxed out")
-            return 'error'
-        except LookupError:
-            print("Could not understand audio")
-            return 'error'
+    except KeyError:
+        print("Invalid API key or quota maxed out")
+        return 'error'
+    except LookupError:
+        print("Could not understand audio")
+        return 'error'
 
 
 def get_QnA_results(statement, debug = False):
