@@ -2,6 +2,7 @@ import speech_recognition as sr
 import http.client
 import json
 import pyaudio
+import time
 
 # Setting up pretty printer - for debugging
 # use like pp.pprint(message)
@@ -16,8 +17,8 @@ creds = credentials()
 import pyttsx3
 from pyttsx3 import engine
 engine = pyttsx3.init()
-engine.setProperty('rate', 175)
-engine.setProperty('voice', 5 )
+engine.setProperty('rate', 125)
+engine.setProperty('voice', "english+f4")
 
 # Initialize recognizer class (for recognizing the speech)
 r = sr.Recognizer()
@@ -27,9 +28,13 @@ source = sr.Microphone()
 def listen():
     with sr.Microphone() as source:
         #r.energy_threshold = 50
-        #r.dynamic_energy_threshold = False
+        r.dynamic_energy_threshold = True
         print("Talk")
-        audio_text = r.listen(source, phrase_time_limit=5)
+        say ("How can I help you?")
+        time.sleep(1)
+        audio_text = r.listen(source)
+        print("finished listening")
+        say ("thanks, looking for an answer...")
     try: 
         message = r.recognize_google(audio_text)
         return message
