@@ -16,6 +16,7 @@ creds = credentials()
 # Setting up text to speech
 from gtts import gTTS
 import os
+import os.path 
 speechlanguage = 'en'
 speechRate = 0.75
 
@@ -25,16 +26,30 @@ r = sr.Recognizer()
 source = sr.Microphone()
 #hot_word='Norbert'
 
+def setup():
+    if not os.path.exists('intro.mp3'):
+        gTTS(text='How can I help you today', lang=speechlanguage, slow=False).save("intro.mp3")
+    if not os.path.exists('looking.mp3'):
+        gTTS(text='thanks, looking for an answer...', lang=speechlanguage, slow=False).save("looking.mp3")
+    if not os.path.exists('no_internet.mp3'):
+        gTTS(text='You have no internet connection. Speak with Ant or Megs', lang=speechlanguage, slow=False).save("no_internet.mp3")
+        
+
+def say_in_built(file):
+    os.system('mpg321 '+file+'.mp3')
+    
+    
+
 def listen():
     with sr.Microphone() as source:
         #r.energy_threshold = 50
         r.dynamic_energy_threshold = True
         print("Talk")
-        say ("How can I help you today?")
+        say_in_built('intro')
         time.sleep(1.5)
         audio_text = r.listen(source)
         print("finished listening")
-        say ("thanks, looking for an answer...")
+        say_in_built('looking')
     try: 
         message = r.recognize_google(audio_text)
         return message
@@ -83,13 +98,22 @@ def say(statement):
     myobj = gTTS(text=statement, lang=speechlanguage, slow=False)
     myobj.save("norbert.mp3")
     os.system("mpg123 norbert.mp3")
+    
+def check_internet_connection():
+    try:
+        urllib.request.urlopen('http://www.google.com')
+        return True
+    except:
+        return False
 
 def main():
-    question = listen()
-    if question != 'error':
-        answer = get_QnA_results(question)
-    if answer != 'error':
-        say(answer)
+    if check_internet_connection():
+        setup()
+        question = listen()
+        if question != 'error':
+            answer = get_QnA_results(question)
+        if answer != 'error':
+            say(answer)
 
 main()
 
