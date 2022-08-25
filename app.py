@@ -14,11 +14,11 @@ from credentials import credentials
 creds = credentials()
 
 # Setting up text to speech
-import pyttsx3
-from pyttsx3 import engine
-engine = pyttsx3.init()
-engine.setProperty('rate', 125)
-engine.setProperty('voice', "english+f4")
+from gtts import gTTS
+import os
+speechlanguage = 'en'
+speechRate = 0.75
+
 
 # Initialize recognizer class (for recognizing the speech)
 r = sr.Recognizer()
@@ -30,8 +30,8 @@ def listen():
         #r.energy_threshold = 50
         r.dynamic_energy_threshold = True
         print("Talk")
-        say ("How can I help you?")
-        time.sleep(1)
+        say ("How can I help you today?")
+        time.sleep(1.5)
         audio_text = r.listen(source)
         print("finished listening")
         say ("thanks, looking for an answer...")
@@ -71,7 +71,7 @@ def get_QnA_results(statement, debug = False):
         if formatted_response['answers'][0]['score'] >= creds.QnA_CONFIDENCE:
             response = formatted_response['answers'][0]['answer']
         else:
-            response = 'I couldn\'t find an answer for that, please try searching the website'
+            response = 'I couldn\'t find an answer for that, please add this to my database brain'
 
         return response
     except:
@@ -80,9 +80,9 @@ def get_QnA_results(statement, debug = False):
     
 
 def say(statement):
-    engine.say(statement)
-    engine.runAndWait()
-
+    myobj = gTTS(text=statement, lang=speechlanguage, slow=False)
+    myobj.save("norbert.mp3")
+    os.system("mpg123 norbert.mp3")
 
 def main():
     question = listen()
